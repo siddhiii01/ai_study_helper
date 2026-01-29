@@ -1,31 +1,49 @@
-import React from "react"
-import axios from "axios"
-import {useForm} from "react-hook-form"
+import React, { useState } from "react";
+import axios from "axios";
+import { useForm } from "react-hook-form";
 
 export const StudyHelper = () => {
+  const [tasks, setTasks] = useState([]);
+  const { register, handleSubmit, reset } = useForm();
 
-    const {register, handleSubmit, reset} = useForm();
+  const onSubmit = async (data) => {
+    try {
+      const response = await axios.post("http://localhost:8080/input", {
+        topic: data.userInput,
+      });
 
-    const onSubmit = async (data) => {
-        try{
-            const repsonse = await axios.post( "http://localhost:5000/api/input", data);
-            console.log("response from backend: ", repsonse.data)
-            reset();
-        }catch (error) {
-            console.error("error sending data:", error);
-         }
+      console.log("response from backend:", response.data);
+
+      // 🔑 THIS IS REQUIRED
+      setTasks(response.data.tasks);
+
+      reset();
+    } catch (error) {
+      console.error("error sending data:", error);
     }
-    return (
-        <>
-            <form onSubmit={handleSubmit(onSubmit)}>
-                <input 
-                    type="text"
-                    placeholder="Enter something "
-                    {...register("userInput")}
-                />
+  };
 
-                <button type="submit">Send</button>
-            </form>
-        </>
-    )
-}
+  return (
+    <>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <input
+          type="text"
+          placeholder="What did you study?"
+          {...register("userInput", { required: true })}
+        />
+        <button type="submit">Submit</button>
+      </form>
+
+      {tasks.length > 0 && (
+        <div>
+          <h3>Your Tasks</h3>
+          <ul>
+            {tasks.map((task, index) => (
+              <li key={index}>{task}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </>
+  );
+};
