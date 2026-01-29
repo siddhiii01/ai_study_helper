@@ -8,7 +8,7 @@ export const StudyHelper = () => {
 
     const onSubmit = async (data) => {
         try{
-            const repsonse = await axios.posst( "http://localhost:5000/api/input", data);
+            const repsonse = await axios.post( "http://localhost:5000/api/input", data);
             console.log("response from backend: ", repsonse.data)
             reset();
         }catch (error) {
